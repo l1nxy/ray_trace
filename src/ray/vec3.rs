@@ -1,10 +1,10 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Debug)]
+#[derive(Debug,Clone, Copy)]
 pub struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 pub fn uini_vec3(vec: &Vec3) -> Vec3 {
@@ -19,6 +19,10 @@ pub fn uini_vec3(vec: &Vec3) -> Vec3 {
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
+    }
+
+    pub fn new_unit() -> Self {
+        Self::new(1.0, 1.0, 1.0)
     }
 
     pub fn length_squared(&self) -> f64 {
@@ -78,6 +82,17 @@ impl Div<f64> for Vec3 {
     }
 }
 
+impl Mul<f64> for Vec3 {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        }
+    }
+}
+
 impl DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
         *self *= 1.0 / rhs
@@ -112,4 +127,3 @@ impl SubAssign for Vec3 {
         };
     }
 }
-
