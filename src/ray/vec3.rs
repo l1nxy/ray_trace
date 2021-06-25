@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Debug,Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -34,7 +34,7 @@ impl Vec3 {
         ret.sqrt()
     }
 
-    pub fn dot(lhs: &Self, rhs: &Self) -> Self {
+    pub fn dot(lhs: Self, rhs: Self) -> Self {
         Self {
             x: lhs.x * rhs.x,
             y: lhs.y * rhs.y,
@@ -69,6 +69,17 @@ impl Sub for Vec3 {
             z: self.z - other.z,
         }
     }
+}
+
+impl Sub<f64> for Vec3 {
+    type Output = Self;
+    fn sub(self, rhs: f64) -> Self::Output {
+        self + (0.0 - rhs)
+    }
+}
+
+impl Add<f64> for Vec3{
+    type Output = Self;
 }
 
 impl Div<f64> for Vec3 {

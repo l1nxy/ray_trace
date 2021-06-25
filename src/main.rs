@@ -17,6 +17,13 @@ fn ray_color(ray: &Ray) -> image::Rgb<u8> {
         cal_color(t1 * 1.0 + t * 1.0),
     ])
 }
+
+fn hit_sphere(center: Vec3, radius: f64, ray: Ray) -> bool {
+    let oc = ray.orig - center;
+    let a = Vec3::dot(ray.dir, ray.dir);
+    let b = Vec3::dot(oc, ray.dir) * 2.0;
+    let c = Vec3::dot(oc, oc) - radius * radius;
+}
 fn main() {
     let ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -38,5 +45,5 @@ fn main() {
         let ray = Ray::new(&origin, &dir);
         ray_color(&ray)
     });
-    image.save("pic.png").expect("save file failed!");
+    image.save("pic.png").unwrap();
 }
