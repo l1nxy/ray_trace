@@ -1,4 +1,5 @@
 pub mod ray;
+mod sphere;
 use ray::vec3::*;
 use ray::Ray;
 
@@ -7,7 +8,15 @@ fn cal_color(ordi: f64) -> u8 {
     (ordi * 255.99) as u8
 }
 
+fn cal_color_vec(point: Vec3) -> image::Rgb<u8> {
+    image::Rgb([cal_color(point.x), cal_color(point.y), cal_color(point.z)])
+}
 fn ray_color(ray: &Ray) -> image::Rgb<u8> {
+    let t_center = hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, ray);
+    if t_center > 0.0 {
+        let n = ray.at(t_center) - Vec3::new(0.0, 0.0, -1.0);
+        return cal_color_vec((n + 1.0) * 0.7);
+    }
     let unit_ray = uini_vec3(&ray.dir);
     let t = 0.5 * (unit_ray.y + 1.0);
     let t1 = 1.0 - t;
@@ -18,11 +27,17 @@ fn ray_color(ray: &Ray) -> image::Rgb<u8> {
     ])
 }
 
-fn hit_sphere(center: Vec3, radius: f64, ray: Ray) -> bool {
+fn hit_sphere(center: Vec3, radius: f64, ray: &Ray) -> f64 {
     let oc = ray.orig - center;
-    let a = Vec3::dot(ray.dir, ray.dir);
-    let b = Vec3::dot(oc, ray.dir) * 2.0;
-    let c = Vec3::dot(oc, oc) - radius * radius;
+    let a = ray.dir.length_squared();
+    let hafl_b = Vec3::dot(oc, ray.dir);
+    let c = oc.length_squared() - radius * radius;
+    let discirminant = hafl_b.powi(2) - a * c;
+    if discirminant < 0.0 {
+        -1.0
+    } else {
+        (-hafl_b - discirminant.sqrt()) / a
+    }
 }
 fn main() {
     let ratio = 16.0 / 9.0;

@@ -26,20 +26,16 @@ impl Vec3 {
     }
 
     pub fn length_squared(&self) -> f64 {
-        self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0)
+        self.x.powi(2) + self.y.powi(2) + self.z.powi(2)
     }
 
     pub fn length(&self) -> f64 {
-        let ret = self.length_squared() as f64;
+        let ret = self.length_squared();
         ret.sqrt()
     }
 
-    pub fn dot(lhs: Self, rhs: Self) -> Self {
-        Self {
-            x: lhs.x * rhs.x,
-            y: lhs.y * rhs.y,
-            z: lhs.z * rhs.z,
-        }
+    pub fn dot(lhs: Self, rhs: Self) -> f64 {
+        lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z
     }
 
     pub fn cross(lhs: &Self, rhs: &Self) -> Self {
@@ -78,8 +74,15 @@ impl Sub<f64> for Vec3 {
     }
 }
 
-impl Add<f64> for Vec3{
+impl Add<f64> for Vec3 {
     type Output = Self;
+    fn add(self, rhs: f64) -> Self::Output {
+        Self {
+            x: self.x + rhs,
+            y: self.y + rhs,
+            z: self.z + rhs,
+        }
+    }
 }
 
 impl Div<f64> for Vec3 {
