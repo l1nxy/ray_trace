@@ -1,5 +1,4 @@
-pub mod vec3;
-use vec3::Vec3;
+use super::vec3::Vec3;
 #[derive(Debug,Clone, Copy)]
 pub struct Ray {
     pub orig: Vec3,

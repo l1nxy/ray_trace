@@ -1,14 +1,39 @@
 use super::ray::*;
-use vec3::Vec3;
+use super::vec3::Vec3;
 #[derive(Debug, Clone, Copy)]
 pub struct HitRecord {
-    p: Vec3,
-    normal: Vec3,
-    t: f64,
+    pub p: Vec3,
+    pub normal: Vec3,
+    pub t: f64,
+    pub front_face: bool,
 }
 
-trait Hittable {
-    fn hit(self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool;
+pub trait Hittable {
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool;
+}
+
+impl HitRecord {
+    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
+        self.front_face = if Vec3::dot(ray.dir, outward_normal) < 0.0 {
+            true
+        } else {
+            false
+        };
+        self.normal = if self.front_face {
+            outward_normal
+        } else {
+            0.0 - outward_normal
+        };
+    }
+
+    pub fn new() -> Self {
+        HitRecord {
+            p: Vec3::new_unit(),
+            normal: Vec3::new_unit(),
+            t: 0.0,
+            front_face: false,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -18,7 +43,7 @@ pub struct Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool {
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool {
         let oc = ray.orig - self.center;
         let a = ray.dir.length_squared();
         let half_b = Vec3::dot(oc, ray.dir);
@@ -36,11 +61,17 @@ impl Hittable for Sphere {
             if root < t_min || root > t_max {
                 return false;
             }
-
-            hit_record.t = root;
-            hit_record.p = ray.at(root);
-            hit_record.normal = (hit_record.p - self.center) / self.radius;
         }
-        todo!()
+        hit_record.t = root;
+        hit_record.p = ray.at(root);
+        let out_normal = (hit_record.p - self.center) / self.radius;
+        hit_record.set_face_normal(&ray, out_normal);
+        true
+    }
+}
+
+impl Sphere {
+    pub fn new(center: Vec3, radius: f64) -> Self {
+        Self { center, radius }
     }
 }

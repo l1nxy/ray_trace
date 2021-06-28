@@ -74,6 +74,17 @@ impl Sub<f64> for Vec3 {
     }
 }
 
+impl Sub<Vec3> for f64 {
+    type Output = Vec3;
+    fn sub(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self - rhs.x,
+            y: self - rhs.y,
+            z: self - rhs.z,
+        }
+    }
+}
+
 impl Add<f64> for Vec3 {
     type Output = Self;
     fn add(self, rhs: f64) -> Self::Output {
