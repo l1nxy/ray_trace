@@ -1,5 +1,8 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+use crate::utils::get_random_number;
+use super::utils::get_random_number_range;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
@@ -43,6 +46,22 @@ impl Vec3 {
             x: lhs.y * rhs.z - rhs.y * lhs.z,
             y: 0.0 - (lhs.x * rhs.z - rhs.x * lhs.z),
             z: lhs.x * rhs.y - rhs.x * lhs.y,
+        }
+    }
+
+    pub fn random() ->Self{
+        Self{
+            x:get_random_number(),
+            y:get_random_number(),
+            z:get_random_number(),
+        }
+    }
+
+    pub fn random_range(min:f64,max:f64) ->Self{
+        Self{
+            x:get_random_number_range(min,max),
+            y:get_random_number_range(min,max),
+            z:get_random_number_range(min,max),
         }
     }
 }
@@ -150,5 +169,15 @@ impl SubAssign for Vec3 {
             y: self.y - rhs.y,
             z: self.z - rhs.z,
         };
+    }
+}
+
+impl Default for Vec3{
+    fn default() -> Self {
+        Self{
+            x:0.0,
+            y:0.0,
+            z:0.0,
+        }
     }
 }

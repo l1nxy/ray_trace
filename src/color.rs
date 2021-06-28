@@ -22,9 +22,18 @@ impl Color {
             }
             ret
         };
+
+        let g = |x: i32| -> i32 {
+            let _r = (x as f64 / 256.0).sqrt();
+            (_r * 256.0) as i32
+        };
         self.r = f(self.r);
         self.g = f(self.g);
         self.b = f(self.b);
+
+        self.r = g(self.r);
+        self.g = g(self.g);
+        self.b = g(self.b);
     }
 }
 
