@@ -35,16 +35,16 @@ fn main() {
     let get_offset = |value: u32| -> f64 { value as f64 + get_random_number() };
 
     let pixle_generator = |x, y| -> image::Rgb<u8> {
-        let mut color = Color::new();
+        let mut color = Color::default();
         for _ in 0..samper_per_pixel {
             let u = get_offset(x) / (image_width -1) as f64;
             let v = get_offset(image_height - y) / (image_height -1) as f64;
 
             let ray = camera.get_ray(u, v);
-            color += ray_color(&ray, &world,max_depth).into();
+            color += ray_color(&ray, &world,max_depth);
         }
 
-        color /= samper_per_pixel;
+        color /= samper_per_pixel as f64;
         color.fix();
         color.into()
     };

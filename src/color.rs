@@ -1,55 +1,55 @@
-use std::ops::{Add, AddAssign, DivAssign};
+use std::ops::{Add, AddAssign, DivAssign, Mul};
 #[derive(Debug, Clone, Copy)]
 pub struct Color {
-    pub r: i32,
-    pub g: i32,
-    pub b: i32,
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
 }
 
 impl Color {
-    pub fn new() -> Self {
-        Self { r: 0, g: 0, b: 0 }
+    pub fn new(ir: f64, ig: f64, ib: f64) -> Self {
+        Self {
+            r: ir,
+            g: ig,
+            b: ib,
+        }
     }
 
     pub fn fix(&mut self) {
-        let f = |x: i32| -> i32 {
-            let mut ret = x;
-            if ret < 0 {
-                ret = 0;
+        let f = |x: f64| -> f64 {
+            let mut ret = x.sqrt();
+            if ret < 0.0 {
+                ret = 0.0;
             }
-            if ret > 255 {
-                ret = 255;
+            if ret > 1.0 {
+                ret = 1.0;
             }
             ret
         };
 
-        let g = |x: i32| -> i32 {
-            let _r = (x as f64 / 256.0).sqrt();
-            (_r * 256.0) as i32
-        };
         self.r = f(self.r);
         self.g = f(self.g);
         self.b = f(self.b);
-
-        self.r = g(self.r);
-        self.g = g(self.g);
-        self.b = g(self.b);
     }
 }
 
 impl From<image::Rgb<u8>> for Color {
     fn from(value: image::Rgb<u8>) -> Self {
         Self {
-            r: value.0[0] as i32,
-            g: value.0[1] as i32,
-            b: value.0[2] as i32,
+            r: (value.0[0] as f64 / 256.0),
+            g: (value.0[1] as f64 / 256.0),
+            b: (value.0[2] as f64 / 256.0),
         }
     }
 }
 
 impl From<Color> for image::Rgb<u8> {
     fn from(value: Color) -> Self {
-        Self([value.r as u8, value.g as u8, value.b as u8])
+        Self([
+            (value.r * 255.99) as u8,
+            (value.g * 255.99) as u8,
+            (value.b * 255.99) as u8,
+        ])
     }
 }
 
@@ -72,10 +72,31 @@ impl AddAssign for Color {
     }
 }
 
-impl DivAssign<i32> for Color {
-    fn div_assign(&mut self, rhs: i32) {
+impl DivAssign<f64> for Color {
+    fn div_assign(&mut self, rhs: f64) {
         self.r /= rhs;
         self.g /= rhs;
         self.b /= rhs;
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+        }
+    }
+}
+
+impl Mul<f64> for Color {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        }
     }
 }

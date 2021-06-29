@@ -56,7 +56,7 @@ impl Hittable for Sphere {
         let sqrtd = discriminant.sqrt();
 
         let mut root = (-half_b - sqrtd) / a;
-        if root - t_min < f64::EPSILON || root > t_max {
+        if root  - t_min < f64::EPSILON || root > t_max {
             root = (-half_b + sqrtd) / a;
             if root < t_min || root > t_max {
                 return false;
