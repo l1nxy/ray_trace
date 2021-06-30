@@ -1,6 +1,7 @@
 mod camera;
 mod color;
 mod hittable_list;
+mod material;
 mod ray;
 mod sphere;
 mod utils;
@@ -8,17 +9,16 @@ mod vec3;
 use camera::*;
 use color::*;
 use hittable_list::*;
+use material::*;
 use ray::*;
+use simple_logger::SimpleLogger;
 use sphere::*;
 use utils::*;
 use vec3::*;
-use simple_logger::SimpleLogger;
-
 
 use image::{ImageBuffer, RgbImage};
 
 fn main() {
-
     SimpleLogger::new().init().unwrap();
 
     let ratio = 16.0 / 9.0;
@@ -27,9 +27,33 @@ fn main() {
     let samper_per_pixel = 100;
     let max_depth = 100;
 
+    let materail_ground = Box::new(Lambertian::new(Color::new(0.8, 0.8, 0.8)));
+    let center = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Some(materail_ground),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Some(center),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Some(material_left),
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Some(material_right),
+    )));
 
     let camera = Camera::new();
     let get_offset = |value: u32| -> f64 { value as f64 + get_random_number() };
@@ -37,11 +61,11 @@ fn main() {
     let pixle_generator = |x, y| -> image::Rgb<u8> {
         let mut color = Color::default();
         for _ in 0..samper_per_pixel {
-            let u = get_offset(x) / (image_width -1) as f64;
-            let v = get_offset(image_height - y) / (image_height -1) as f64;
+            let u = get_offset(x) / (image_width - 1) as f64;
+            let v = get_offset(image_height - y) / (image_height - 1) as f64;
 
             let ray = camera.get_ray(u, v);
-            color += ray_color(&ray, &world,max_depth);
+            color += ray_color(&ray, &world, max_depth);
         }
 
         color /= samper_per_pixel as f64;

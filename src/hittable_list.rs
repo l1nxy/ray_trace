@@ -1,5 +1,6 @@
 use super::sphere::*;
 use super::*;
+use std::rc::Rc;
 
 pub struct HittableList {
     objects: Vec<Box<dyn Hittable>>,
@@ -20,10 +21,10 @@ impl HittableList {
     }
 
     pub fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::new();
         let mut hit_anythings = false;
         let mut closest_so_far = t_max;
         for obj in self.objects.iter() {
+            let mut temp_rec = HitRecord::new(Rc::new(None));
             if obj.hit(ray, t_min, closest_so_far, &mut temp_rec) {
                 hit_anythings = true;
                 closest_so_far = temp_rec.t;

@@ -1,11 +1,13 @@
 use super::ray::*;
 use super::vec3::Vec3;
-#[derive(Debug, Clone, Copy)]
+use crate::material::*;
+use std::rc::Rc;
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub mat: Rc<Option<Box<dyn Material>>>,
 }
 
 pub trait Hittable {
@@ -26,20 +28,22 @@ impl HitRecord {
         };
     }
 
-    pub fn new() -> Self {
+    pub fn new(m: Rc<Option<Box<dyn Material>>>) -> Self {
         HitRecord {
             p: Vec3::new_unit(),
             normal: Vec3::new_unit(),
             t: 0.0,
             front_face: false,
+            mat: m.clone(),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+//#[derive(Debug, Clone, Copy)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
+    pub mat: Rc<Option<Box<dyn Material>>>,
 }
 
 impl Hittable for Sphere {
@@ -56,7 +60,7 @@ impl Hittable for Sphere {
         let sqrtd = discriminant.sqrt();
 
         let mut root = (-half_b - sqrtd) / a;
-        if root  - t_min < f64::EPSILON || root > t_max {
+        if root - t_min < f64::EPSILON || root > t_max {
             root = (-half_b + sqrtd) / a;
             if root < t_min || root > t_max {
                 return false;
@@ -66,12 +70,17 @@ impl Hittable for Sphere {
         hit_record.p = ray.at(root);
         let out_normal = (hit_record.p - self.center) / self.radius;
         hit_record.set_face_normal(&ray, out_normal);
+        hit_record.mat = self.mat.clone();
         true
     }
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64) -> Self {
-        Self { center, radius }
+    pub fn new(center: Vec3, radius: f64, material: Option<Box<dyn Material>>) -> Self {
+        Self {
+            center,
+            radius,
+            mat: Rc::new(material),
+        }
     }
 }

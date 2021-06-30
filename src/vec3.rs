@@ -1,7 +1,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
-use crate::utils::get_random_number;
 use super::utils::get_random_number_range;
+use crate::utils::get_random_number;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
@@ -37,6 +37,10 @@ impl Vec3 {
         ret.sqrt()
     }
 
+    pub fn unit(&self) -> Self {
+        uini_vec3(self)
+    }
+
     pub fn dot(lhs: Self, rhs: Self) -> f64 {
         lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z
     }
@@ -49,20 +53,28 @@ impl Vec3 {
         }
     }
 
-    pub fn random() ->Self{
-        Self{
-            x:get_random_number(),
-            y:get_random_number(),
-            z:get_random_number(),
+    pub fn random() -> Self {
+        Self {
+            x: get_random_number(),
+            y: get_random_number(),
+            z: get_random_number(),
         }
     }
 
-    pub fn random_range(min:f64,max:f64) ->Self{
-        Self{
-            x:get_random_number_range(min,max),
-            y:get_random_number_range(min,max),
-            z:get_random_number_range(min,max),
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Self {
+            x: get_random_number_range(min, max),
+            y: get_random_number_range(min, max),
+            z: get_random_number_range(min, max),
         }
+    }
+
+    pub fn near_zero(&self) -> bool {
+        self.x.abs() < 0.00000001 && self.y.abs() < 0.00000001 && self.z.abs() < 0.00000001
+    }
+
+    pub fn reflect(self, rhs: Vec3) -> Self {
+        self - rhs * 2.0 * Vec3::dot(self, rhs)
     }
 }
 impl Add for Vec3 {
@@ -172,12 +184,12 @@ impl SubAssign for Vec3 {
     }
 }
 
-impl Default for Vec3{
+impl Default for Vec3 {
     fn default() -> Self {
-        Self{
-            x:0.0,
-            y:0.0,
-            z:0.0,
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
         }
     }
 }
