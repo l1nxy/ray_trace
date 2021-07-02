@@ -11,7 +11,7 @@ pub fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
-    if world.hit(*ray, 0.000000000000001, f64::INFINITY, &mut rec) {
+    if world.hit(*ray, 0.0001, f64::INFINITY, &mut rec) {
         // let target = rec.p + rec.normal + uini_vec3(&random_in_unit_sphere());
         // let new_ray_dir = target - rec.p;
         // let new_ray = Ray::new(&rec.p, &new_ray_dir);
@@ -20,11 +20,10 @@ pub fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
         let mut scattered = Ray::new(&Vec3::default(), &Vec3::default());
         let mut color = Color::default();
         let mat = rec.mat.clone();
-        if let Some(x) = &(*mat){
+        if let Some(x) = &(*mat) {
             if (*x).scatter(ray, &mut rec, &mut color, &mut scattered) {
-                return color* ray_color(&scattered, world, depth-1);
+                return ray_color(&scattered, world, depth - 1) * 0.5;
             }
-            
         }
     }
 

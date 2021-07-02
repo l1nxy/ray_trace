@@ -22,15 +22,15 @@ fn main() {
     SimpleLogger::new().init().unwrap();
 
     let ratio = 16.0 / 9.0;
-    let image_width = 400;
-    let image_height = (400.0 / ratio) as u32;
-    let samper_per_pixel = 100;
-    let max_depth = 100;
+    let image_width = 1200;
+    let image_height = (image_width as f64 / ratio) as u32;
+    let samper_per_pixel = 50;
+    let max_depth = 50;
 
     let materail_ground = Box::new(Lambertian::new(Color::new(0.8, 0.8, 0.8)));
     let center = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
-    let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
-    let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+    let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 1.0));
+    let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3));
 
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(

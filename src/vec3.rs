@@ -70,7 +70,7 @@ impl Vec3 {
     }
 
     pub fn near_zero(&self) -> bool {
-        self.x.abs() < 0.00000001 && self.y.abs() < 0.00000001 && self.z.abs() < 0.00000001
+        self.x.abs() < 0.00000000001 && self.y.abs() < 0.00000000001 && self.z.abs() < 0.00000000001
     }
 
     pub fn reflect(self, rhs: Vec3) -> Self {
