@@ -9,7 +9,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool {
+    fn scatter(&self, _: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool {
         let mut scatter_dir = rec.normal + random_in_unit_sphere().unit();
         if scatter_dir.near_zero() {
             scatter_dir = rec.normal;

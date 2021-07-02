@@ -30,7 +30,7 @@ fn main() {
     let materail_ground = Box::new(Lambertian::new(Color::new(0.8, 0.8, 0.8)));
     let center = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
     let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 1.0));
-    let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3));
+    let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.1));
 
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(
