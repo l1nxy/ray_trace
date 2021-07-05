@@ -1,4 +1,4 @@
-use crate::{color::Color, ray::Ray, sphere::HitRecord, utils::random_in_unit_sphere, vec3::Vec3};
+use crate::{color::Color, ray::Ray, sphere::HitRecord, utils::random_in_unit_sphere, vec3::*};
 
 pub trait Material {
     fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool;
@@ -54,11 +54,43 @@ pub struct Dielectric {
     pub ir: f64,
 }
 
+impl Dielectric {
+    pub fn new(_refracted: f64) -> Self {
+        Self { ir: _refracted }
+    }
+}
+
 impl Material for Dielectric {
-    fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool {
-        let attenuation = Color::new(1.0, 1.0, 1.0);
-        let refaction_ratio = if rec.front_face { 1.0 / self.ir } else { self.ir };
-        let unit_dir = ray.dir.unit();
-        let refracted =  
+    fn scatter(
+        &self,
+        ray: &Ray,
+        rec: &HitRecord,
+        _color: &mut Color,
+        _scattered: &mut Ray,
+    ) -> bool {
+        *_color = Color::new(1.0, 1.0, 1.0);
+        let _refaction_ratio = if rec.front_face {
+            1.0 / self.ir
+        } else {
+            self.ir
+        };
+
+        let _unit_dir = ray.dir.unit();
+        let _cos_theta = fmin(
+            Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - ray.dir, rec.normal),
+            1.0,
+        );
+        let _sin_theta = (1.0 - _cos_theta).sqrt();
+
+        let mut direction = Vec3::default();
+
+        if _refaction_ratio * _sin_theta > 1.0 {
+            direction = _unit_dir.reflect(rec.normal);
+        } else {
+            direction = _unit_dir.refract(rec.normal, _refaction_ratio);
+        }
+
+        *_scattered = Ray::new(&rec.p, &direction);
+        true
     }
 }

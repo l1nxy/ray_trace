@@ -24,24 +24,26 @@ fn main() {
     let ratio = 16.0 / 9.0;
     let image_width = 1200;
     let image_height = (image_width as f64 / ratio) as u32;
-    let samper_per_pixel = 50;
+    let samper_per_pixel = 10;
     let max_depth = 50;
 
-    let materail_ground = Box::new(Lambertian::new(Color::new(0.8, 0.8, 0.8)));
-    let center = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
-    let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 1.0));
+    let materail_ground = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let center = Box::new(Lambertian::new(Color::new(0.7, 0.8, 0.3)));
+    //klet center = Box::new(Dielectric::new(1.5));
+    let material_left = Box::new(Dielectric::new(1.5));
+    //let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 1.0));
     let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.1));
 
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Some(materail_ground),
+        Some(center),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
-        Some(center),
+        Some(materail_ground),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),

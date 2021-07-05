@@ -1,7 +1,4 @@
-use std::{
-    cmp::min,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
-};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 use super::utils::get_random_number_range;
 use crate::utils::get_random_number;
@@ -19,6 +16,14 @@ pub fn uini_vec3(vec: &Vec3) -> Vec3 {
         x: vec.x / l,
         y: vec.y / l,
         z: vec.z / l,
+    }
+}
+
+pub fn fmin(lhs: f64, rhs: f64) -> f64 {
+    if lhs < rhs {
+        lhs
+    } else {
+        rhs
     }
 }
 
@@ -80,8 +85,12 @@ impl Vec3 {
         self - rhs * 2.0 * Vec3::dot(self, rhs)
     }
 
-    pub fn refract(self, normal: Vec3, ratio: f64) -> Vec3 {
-        let cos_theta = min(Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - self, normal), 1.0);
+    pub fn refract(self, normal: Vec3, _ratio: f64) -> Vec3 {
+        let _cos_theta = fmin(Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - self, normal), 1.0);
+        let _ray_out_prep = (self + normal * _cos_theta) * _ratio;
+        let _ray_out_parallel =
+            normal * (0.0 - (1.0 - _ray_out_prep.length_squared()).abs().sqrt());
+        _ray_out_prep + _ray_out_parallel
     }
 }
 impl Add for Vec3 {
