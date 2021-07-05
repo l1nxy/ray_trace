@@ -49,3 +49,16 @@ impl Metal {
         }
     }
 }
+
+pub struct Dielectric {
+    pub ir: f64,
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool {
+        let attenuation = Color::new(1.0, 1.0, 1.0);
+        let refaction_ratio = if rec.front_face { 1.0 / self.ir } else { self.ir };
+        let unit_dir = ray.dir.unit();
+        let refracted =  
+    }
+}
