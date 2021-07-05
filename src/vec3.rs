@@ -1,4 +1,7 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::{
+    cmp::min,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
+};
 
 use super::utils::get_random_number_range;
 use crate::utils::get_random_number;
@@ -75,6 +78,10 @@ impl Vec3 {
 
     pub fn reflect(self, rhs: Vec3) -> Self {
         self - rhs * 2.0 * Vec3::dot(self, rhs)
+    }
+
+    pub fn refract(self, normal: Vec3, ratio: f64) -> Vec3 {
+        let cos_theta = min(Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - self, normal), 1.0);
     }
 }
 impl Add for Vec3 {
