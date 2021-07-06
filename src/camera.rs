@@ -1,5 +1,6 @@
 use super::ray::*;
 use super::vec3::*;
+use std::f64::consts::*;
 
 pub struct Camera {
     pub orig: Vec3,
@@ -9,7 +10,8 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Self {
+    pub fn new(vfov: f64, aspect_ratio: f64) -> Self {
+        let theta = vfov * PI / 180.0;
         let ratio = 16.0 / 9.0;
         let viewport_height = 2.0;
         let viewport_width = ratio * viewport_height;

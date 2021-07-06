@@ -1,4 +1,6 @@
-use crate::{color::Color, ray::Ray, sphere::HitRecord, utils::random_in_unit_sphere, vec3::*};
+use crate::{
+    color::Color, ray::Ray, sphere::HitRecord, utils::random_in_unit_sphere, utils::*, vec3::*,
+};
 
 pub trait Material {
     fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool;
@@ -58,6 +60,11 @@ impl Dielectric {
     pub fn new(_refracted: f64) -> Self {
         Self { ir: _refracted }
     }
+
+    fn reflectance(cosine: f64, ref_index: f64) -> f64 {
+        let r0 = ((1.0 - ref_index) / (1.0 + ref_index)).powi(2);
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Material for Dielectric {
@@ -80,11 +87,14 @@ impl Material for Dielectric {
             Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - ray.dir, rec.normal),
             1.0,
         );
-        let _sin_theta = (1.0 - _cos_theta).sqrt();
+        let _sin_theta = (1.0 - _cos_theta.powi(2)).sqrt();
 
         let mut direction = Vec3::default();
+        let cannot_refract = _refaction_ratio * _sin_theta > 1.0;
 
-        if _refaction_ratio * _sin_theta > 1.0 {
+        if cannot_refract
+            || Dielectric::reflectance(_cos_theta, _refaction_ratio) > get_random_number()
+        {
             direction = _unit_dir.reflect(rec.normal);
         } else {
             direction = _unit_dir.refract(rec.normal, _refaction_ratio);

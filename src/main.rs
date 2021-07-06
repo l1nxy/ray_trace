@@ -31,6 +31,7 @@ fn main() {
     let center = Box::new(Lambertian::new(Color::new(0.7, 0.8, 0.3)));
     //klet center = Box::new(Dielectric::new(1.5));
     let material_left = Box::new(Dielectric::new(1.5));
+    let material_left_2 = Box::new(Dielectric::new(1.5));
     //let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 1.0));
     let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.1));
 
@@ -49,6 +50,12 @@ fn main() {
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
         Some(material_left),
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        -0.4,
+        Some(material_left_2),
     )));
 
     world.add(Box::new(Sphere::new(
