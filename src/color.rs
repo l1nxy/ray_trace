@@ -1,4 +1,6 @@
 use std::ops::{Add, AddAssign, DivAssign, Mul};
+
+use crate::utils::{get_random_number, get_random_number_range};
 #[derive(Debug, Clone, Copy)]
 pub struct Color {
     pub r: f64,
@@ -30,6 +32,21 @@ impl Color {
         self.r = f(self.r);
         self.g = f(self.g);
         self.b = f(self.b);
+    }
+
+    pub fn random() -> Self {
+        Self {
+            r: get_random_number(),
+            b: get_random_number(),
+            g: get_random_number(),
+        }
+    }
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Self {
+            r: get_random_number_range(min, max),
+            b: get_random_number_range(min, max),
+            g: get_random_number_range(min, max),
+        }
     }
 }
 
