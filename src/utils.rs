@@ -23,7 +23,7 @@ pub fn ray_color(ray_in: &Ray, world: &HittableList, depth: i32) -> Color {
             if (*x).scatter(ray_in, &mut rec, &mut color, &mut scattered) {
                 return ray_color(&scattered, world, depth - 1) * color;
             }
-            return Color::new(0.0,0.0,0.0);
+            return Color::new(0.0, 0.0, 0.0);
         }
     }
 
@@ -44,6 +44,18 @@ pub fn get_random_number_range(min: f64, max: f64) -> f64 {
 pub fn random_in_unit_sphere() -> Vec3 {
     loop {
         let p = Vec3::random_range(-1.0, 1.0);
+        if p.length_squared() < 1.0 {
+            return p;
+        }
+    }
+}
+pub fn random_in_unit_disk() -> Vec3 {
+    loop {
+        let p = Vec3::new(
+            get_random_number_range(-1.0, 1.0),
+            get_random_number_range(-1.0, 1.0),
+            0.0,
+        );
         if p.length_squared() < 1.0 {
             return p;
         }

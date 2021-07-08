@@ -67,7 +67,8 @@ fn main() {
     let lookfrom = Vec3::new(-2.0, 2.0, 1.0);
     let lookat = Vec3::new(0.0, 0.0, -1.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
-    let camera = Camera::new(lookfrom, lookat, vup, 20.0, ratio);
+    let dist_to_focus = (lookfrom - lookat).length();
+    let camera = Camera::new(lookfrom, lookat, vup, 20.0, ratio, 2.0, dist_to_focus);
     let get_offset = |value: u32| -> f64 { value as f64 + get_random_number() };
 
     let pixle_generator = |x, y| -> image::Rgb<u8> {
