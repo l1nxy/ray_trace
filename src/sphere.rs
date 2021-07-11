@@ -1,86 +1,51 @@
 use super::ray::*;
 use super::vec3::Vec3;
 use crate::material::*;
+use std::borrow::Borrow;
 use std::rc::Rc;
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub p: Vec3,
     pub normal: Vec3,
     pub t: f64,
-    pub front_face: bool,
-    pub mat: Rc<Option<Box<dyn Material>>>,
+    pub mat: &'a dyn Material,
 }
 
 pub trait Hittable {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool;
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
-
-impl HitRecord {
-    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
-        self.front_face = if Vec3::dot(ray.dir, outward_normal) < 0.0 {
-            true
-        } else {
-            false
-        };
-        self.normal = if self.front_face {
-            outward_normal
-        } else {
-            0.0 - outward_normal
-        };
-    }
-
-    pub fn new(m: Rc<Option<Box<dyn Material>>>) -> Self {
-        HitRecord {
-            p: Vec3::new_unit(),
-            normal: Vec3::new_unit(),
-            t: 0.0,
-            front_face: false,
-            mat: m.clone(),
-        }
-    }
-}
-
 //#[derive(Debug, Clone, Copy)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub mat: Rc<Option<Box<dyn Material>>>,
+    pub mat: Box<dyn Material>,
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord) -> bool {
+    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.orig - self.center;
         let a = ray.dir.length_squared();
         let half_b = Vec3::dot(oc, ray.dir);
         let c = oc.length_squared() - self.radius.powi(2);
 
         let discriminant = half_b.powi(2) - a * c;
-        if discriminant < 0.0 {
-            return false;
-        }
-        let sqrtd = discriminant.sqrt();
+        let root1 = (-half_b - discriminant.sqrt()) / a;
+        let root2 = (-half_b + discriminant.sqrt()) / a;
 
-        let mut root = (-half_b - sqrtd) / a;
-        if root - t_min < f64::EPSILON || root > t_max {
-            root = (-half_b + sqrtd) / a;
-            if root < t_min || root > t_max {
-                return false;
-            }
-        }
-        hit_record.t = root;
-        hit_record.p = ray.at(root);
-        let out_normal = (hit_record.p - self.center) / self.radius;
-        hit_record.set_face_normal(&ray, out_normal);
-        hit_record.mat = self.mat.clone();
-        true
-    }
-}
+        let ret1 = root1 > t_min && root1 < t_max;
+        let ret2 = root2 > t_min && root2 < t_max;
 
-impl Sphere {
-    pub fn new(center: Vec3, radius: f64, material: Option<Box<dyn Material>>) -> Self {
-        Self {
-            center,
-            radius,
-            mat: Rc::new(material),
+        if discriminant > 0.0 && (ret1 || ret2) {
+            let t = if ret1 { root1 } else { root2 };
+            let p = ray.at(t);
+            let normal = (p - self.center) / self.radius;
+            Some(HitRecord {
+                t,
+                p,
+                normal,
+                mat: self.mat.borrow(),
+            })
+        } else {
+            None
         }
     }
 }

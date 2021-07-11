@@ -6,7 +6,6 @@ use super::vec3::*;
 use std::rc::Rc;
 
 pub fn ray_color(ray_in: &Ray, world: &HittableList, depth: i32) -> Color {
-    let mut rec = HitRecord::new(Rc::new(None));
     if depth <= 0 {
         return Color::default();
     }
