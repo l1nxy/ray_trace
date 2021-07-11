@@ -24,7 +24,7 @@ impl HittableList {
         let mut hit_anythings = false;
         let mut closest_so_far = t_max;
         for obj in self.objects.iter() {
-            let mut temp_rec = HitRecord::new(Rc::new(None));
+            let mut temp_rec = HitRecord{ma}
             if obj.hit(ray, t_min, closest_so_far, &mut temp_rec) {
                 hit_anythings = true;
                 closest_so_far = temp_rec.t;
