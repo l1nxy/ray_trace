@@ -9,7 +9,6 @@ mod vec3;
 use camera::*;
 use color::*;
 use hittable_list::*;
-use log::Log;
 use material::*;
 use ray::*;
 use simple_logger::SimpleLogger;
@@ -22,11 +21,11 @@ fn random_scene() -> Box<HittableList> {
     let mut world = Box::new(HittableList::new());
 
     let materail_ground = Box::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -1000.0, -0.0),
-        1000.0,
-        Some(materail_ground),
-    )));
+    world.add(Box::new(Sphere {
+        center: Vec3::new(0.0, -1000.0, -0.0),
+        radius: 1000.0,
+        mat: materail_ground,
+    }));
 
     for i in -11..11 {
         for j in -11..11 {
@@ -41,40 +40,52 @@ fn random_scene() -> Box<HittableList> {
                 if random_mat < 0.8 {
                     let albedo = Color::random();
                     let mat = Box::new(Lambertian::new(albedo));
-                    world.add(Box::new(Sphere::new(center, 0.2, Some(mat))));
+                    world.add(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        mat,
+                    }));
                 } else if random_mat < 0.95 {
                     let albedo = Color::random_range(0.5, 0.9);
                     let fuzz = get_random_number_range(0.0, 0.5);
                     let mat = Box::new(Metal::new(albedo, fuzz));
-                    world.add(Box::new(Sphere::new(center, 0.2, Some(mat))));
+                    world.add(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        mat,
+                    }));
                 } else {
                     let mat = Box::new(Dielectric::new(1.5));
-                    world.add(Box::new(Sphere::new(center, 0.2, Some(mat))));
+                    world.add(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        mat,
+                    }));
                 }
             }
         }
     }
 
     let mat1 = Box::new(Dielectric::new(1.5));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 1.0, 0.0),
-        1.0,
-        Some(mat1),
-    )));
+    world.add(Box::new(Sphere {
+        center: Vec3::new(0.0, 1.0, 0.0),
+        radius: 1.0,
+        mat: mat1,
+    }));
 
     let mat2 = Box::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(-4.0, 1.0, 0.0),
-        1.0,
-        Some(mat2),
-    )));
+    world.add(Box::new(Sphere {
+        center: Vec3::new(-4.0, 1.0, 0.0),
+        radius: 1.0,
+        mat: mat2,
+    }));
 
     let mat3 = Box::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(4.0, 1.0, 0.0),
-        1.0,
-        Some(mat3),
-    )));
+    world.add(Box::new(Sphere {
+        center: Vec3::new(4.0, 1.0, 0.0),
+        radius: 1.0,
+        mat: mat3,
+    }));
     world
 }
 fn main() {
@@ -83,7 +94,7 @@ fn main() {
     let ratio = 3.0 / 2.0;
     let image_width = 1200;
     let image_height = (image_width as f64 / ratio) as u32;
-    let samper_per_pixel = 1;
+    let samper_per_pixel = 50;
     let max_depth = 10;
 
     let world = random_scene();

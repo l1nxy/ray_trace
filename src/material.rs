@@ -76,7 +76,7 @@ impl Material for Dielectric {
         _scattered: &mut Ray,
     ) -> bool {
         *_color = Color::new(1.0, 1.0, 1.0);
-        let _refaction_ratio = if rec.front_face {
+        let _refaction_ratio = if Vec3::dot(rec.normal, ray.dir) > 0.0 {
             1.0 / self.ir
         } else {
             self.ir
@@ -89,17 +89,15 @@ impl Material for Dielectric {
         );
         let _sin_theta = (1.0 - _cos_theta.powi(2)).sqrt();
 
-        let mut direction = Vec3::default();
         let cannot_refract = _refaction_ratio * _sin_theta > 1.0;
 
-        if cannot_refract
+        let direction = if cannot_refract
             || Dielectric::reflectance(_cos_theta, _refaction_ratio) > get_random_number()
         {
-            direction = _unit_dir.reflect(rec.normal);
+            _unit_dir.reflect(rec.normal)
         } else {
-            direction = _unit_dir.refract(rec.normal, _refaction_ratio);
-        }
-
+            _unit_dir.refract(rec.normal, _refaction_ratio)
+        };
         *_scattered = Ray::new(&rec.p, &direction);
         true
     }

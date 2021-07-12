@@ -2,7 +2,6 @@ use super::ray::*;
 use super::vec3::Vec3;
 use crate::material::*;
 use std::borrow::Borrow;
-use std::rc::Rc;
 pub struct HitRecord<'a> {
     pub p: Vec3,
     pub normal: Vec3,
