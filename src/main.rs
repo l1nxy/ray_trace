@@ -11,7 +11,6 @@ use color::*;
 use hittable_list::*;
 use material::*;
 use ray::*;
-use simple_logger::SimpleLogger;
 use sphere::*;
 use utils::*;
 use vec3::*;
@@ -19,7 +18,6 @@ use vec3::*;
 use image::{ImageBuffer, RgbImage};
 fn random_scene() -> Box<HittableList> {
     let mut world = Box::new(HittableList::new());
-
     let materail_ground = Box::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     world.add(Box::new(Sphere {
         center: Vec3::new(0.0, -1000.0, -0.0),
@@ -89,12 +87,9 @@ fn random_scene() -> Box<HittableList> {
     world
 }
 fn main() {
-    SimpleLogger::new().init().unwrap();
-    log::warn!("start!");
-    let ratio = 3.0 / 2.0;
     let image_width = 1200;
-    let image_height = (image_width as f64 / ratio) as u32;
-    let samper_per_pixel = 50;
+    let image_height = 800;
+    let samper_per_pixel = 10;
     let max_depth = 10;
 
     let world = random_scene();
@@ -102,7 +97,7 @@ fn main() {
     let lookat = Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
-    let camera = Camera::new(lookfrom, lookat, vup, 20.0, ratio, 0.1, dist_to_focus);
+    let camera = Camera::new(lookfrom, lookat, vup, 20.0, 3.0 / 2.0, 0.1, dist_to_focus);
     let get_offset = |value: u32| -> f64 { value as f64 + get_random_number() };
 
     let pixle_generator = |x, y| -> image::Rgb<u8> {
@@ -122,5 +117,4 @@ fn main() {
 
     let image: RgbImage = ImageBuffer::from_fn(image_width, image_height, pixle_generator);
     image.save("pic.png").unwrap();
-    log::warn!("end!");
 }

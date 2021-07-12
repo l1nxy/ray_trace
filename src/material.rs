@@ -63,7 +63,7 @@ impl Dielectric {
 
     fn reflectance(cosine: f64, ref_index: f64) -> f64 {
         let r0 = ((1.0 - ref_index) / (1.0 + ref_index)).powi(2);
-        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+        r0 + (1.0 - r0) * ((1.0 - cosine).powi(5))
     }
 }
 
@@ -76,29 +76,28 @@ impl Material for Dielectric {
         _scattered: &mut Ray,
     ) -> bool {
         *_color = Color::new(1.0, 1.0, 1.0);
-        let _refaction_ratio = if Vec3::dot(rec.normal, ray.dir) > 0.0 {
-            1.0 / self.ir
+        let (_refaction_ratio, _out_normal) = if Vec3::dot(rec.normal, ray.dir) < 0.0 {
+            (1.0 / self.ir, rec.normal)
         } else {
-            self.ir
+            (self.ir, 0.0 - rec.normal)
         };
 
         let _unit_dir = ray.dir.unit();
         let _cos_theta = fmin(
-            Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - ray.dir, rec.normal),
+            Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - ray.dir, _out_normal),
             1.0,
         );
         let _sin_theta = (1.0 - _cos_theta.powi(2)).sqrt();
 
         let cannot_refract = _refaction_ratio * _sin_theta > 1.0;
 
-        let direction = if cannot_refract
+        *_scattered = if cannot_refract
             || Dielectric::reflectance(_cos_theta, _refaction_ratio) > get_random_number()
         {
-            _unit_dir.reflect(rec.normal)
+            Ray::new(&rec.p, &_unit_dir.reflect(_out_normal))
         } else {
-            _unit_dir.refract(rec.normal, _refaction_ratio)
+            Ray::new(&rec.p, &_unit_dir.refract(_out_normal, _refaction_ratio))
         };
-        *_scattered = Ray::new(&rec.p, &direction);
         true
     }
 }
