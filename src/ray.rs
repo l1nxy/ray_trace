@@ -1,5 +1,5 @@
 use super::vec3::Vec3;
-#[derive(Debug,Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub orig: Vec3,
     pub dir: Vec3,
@@ -14,7 +14,6 @@ impl Ray {
     }
 
     pub fn at(self, t: f64) -> Vec3 {
-        let ret = self.orig + self.dir * t;
-        ret
+        self.orig + self.dir * t
     }
 }

@@ -18,7 +18,7 @@ impl Material for Lambertian {
         }
         *scattered = Ray::new(&rec.p, &scatter_dir);
         *color = self.albedo;
-        return true;
+        true
     }
 }
 

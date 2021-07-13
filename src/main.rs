@@ -1,3 +1,4 @@
+#![deny(clippy::all)]
 mod camera;
 mod color;
 mod hittable_list;
