@@ -2,7 +2,7 @@ use super::sphere::*;
 use super::*;
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    objects: Vec<Arc<dyn Hittable>>,
 }
 
 impl HittableList {
@@ -12,11 +12,11 @@ impl HittableList {
         }
     }
 
-    pub fn add(&mut self, obj: Box<dyn Hittable>) {
+    pub fn add(&mut self, obj: Arc<dyn Hittable>) {
         self.objects.push(obj);
     }
 
-    pub fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    pub fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
         let mut hit_rec :Option<HitRecord> = None;
         for obj in &self.objects {

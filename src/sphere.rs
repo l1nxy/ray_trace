@@ -1,27 +1,27 @@
 use super::ray::*;
 use super::vec3::Vec3;
 use crate::material::*;
-use std::borrow::Borrow;
-pub struct HitRecord<'a> {
+use std::sync::Arc;
+pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
     pub t: f64,
-    pub mat: &'a dyn Material,
+    pub mat: Arc<dyn Material>,
 }
 
 pub trait Hittable {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 //#[derive(Debug, Clone, Copy)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub mat: Box<dyn Material>,
+    pub mat: Arc<dyn Material>,
 }
 
 impl Hittable for Sphere {
     #[inline(always)]
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.orig - self.center;
         let a = ray.dir.length_squared();
         let half_b = Vec3::dot(oc, ray.dir);
@@ -42,7 +42,7 @@ impl Hittable for Sphere {
                 t,
                 p,
                 normal,
-                mat: self.mat.borrow(),
+                mat: self.mat.clone(),
             })
         } else {
             None

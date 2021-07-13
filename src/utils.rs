@@ -7,7 +7,7 @@ pub fn ray_color(ray_in: &Ray, world: &HittableList, depth: i32) -> Color {
     if depth == 0 {
         return Color::default();
     }
-    if let Some(ret) = world.hit(*ray_in, 0.001, f64::MAX) {
+    if let Some(ret) = world.hit(ray_in, 0.001, f64::INFINITY) {
         let mut scattered = Ray::new(&Vec3::default(), &Vec3::default());
         let mut color = Color::default();
         if ret.mat.scatter(ray_in, &ret, &mut color, &mut scattered) {

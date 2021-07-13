@@ -15,10 +15,12 @@ use sphere::*;
 use utils::*;
 use vec3::*;
 
+use std::sync::Arc;
+
 fn random_scene() -> Box<HittableList> {
     let mut world = Box::new(HittableList::new());
-    let materail_ground = Box::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-    world.add(Box::new(Sphere {
+    let materail_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    world.add(Arc::new(Sphere {
         center: Vec3::new(0.0, -1000.0, -0.0),
         radius: 1000.0,
         mat: materail_ground,
@@ -36,8 +38,8 @@ fn random_scene() -> Box<HittableList> {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if random_mat < 0.8 {
                     let albedo = Color::random();
-                    let mat = Box::new(Lambertian::new(albedo));
-                    world.add(Box::new(Sphere {
+                    let mat = Arc::new(Lambertian::new(albedo));
+                    world.add(Arc::new(Sphere {
                         center,
                         radius: 0.2,
                         mat,
@@ -45,15 +47,15 @@ fn random_scene() -> Box<HittableList> {
                 } else if random_mat < 0.95 {
                     let albedo = Color::random_range(0.5, 0.9);
                     let fuzz = get_random_number_range(0.0, 0.5);
-                    let mat = Box::new(Metal::new(albedo, fuzz));
-                    world.add(Box::new(Sphere {
+                    let mat = Arc::new(Metal::new(albedo, fuzz));
+                    world.add(Arc::new(Sphere {
                         center,
                         radius: 0.2,
                         mat,
                     }));
                 } else {
-                    let mat = Box::new(Dielectric::new(1.5));
-                    world.add(Box::new(Sphere {
+                    let mat = Arc::new(Dielectric::new(1.5));
+                    world.add(Arc::new(Sphere {
                         center,
                         radius: 0.2,
                         mat,
@@ -63,22 +65,22 @@ fn random_scene() -> Box<HittableList> {
         }
     }
 
-    let mat1 = Box::new(Dielectric::new(1.5));
-    world.add(Box::new(Sphere {
+    let mat1 = Arc::new(Dielectric::new(1.5));
+    world.add(Arc::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0),
         radius: 1.0,
         mat: mat1,
     }));
 
-    let mat2 = Box::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.add(Box::new(Sphere {
+    let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    world.add(Arc::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
         mat: mat2,
     }));
 
-    let mat3 = Box::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.add(Box::new(Sphere {
+    let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    world.add(Arc::new(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0),
         radius: 1.0,
         mat: mat3,
@@ -115,17 +117,26 @@ fn main() {
             println!("line: {}", y);
         }
         rows.for_each(|(x, y, pixel)| {
-            let mut color = Color::default();
-            for _ in 0..samper_per_pixel {
-                let u = get_offset(x) / (image_width - 1) as f64;
-                let v = get_offset(y) / (image_height - 1) as f64;
+            let mut color = (0..samper_per_pixel)
+                .into_iter()
+                .fold(Color::default(), |acc, _| {
+                    let u = get_offset(x) / (image_width - 1) as f64;
+                    let v = get_offset(y) / (image_height - 1) as f64;
 
-                let ray = camera.get_ray(u, v);
-                color += ray_color(&ray, &world, max_depth);
-            }
+                    let ray = camera.get_ray(u, v);
+                    acc + ray_color(&ray, &world, max_depth)
+                });
+
+            // for _ in 0..samper_per_pixel {
+            //     let u = get_offset(x) / (image_width - 1) as f64;
+            //     let v = get_offset(y) / (image_height - 1) as f64;
+
+            //     let ray = camera.get_ray(u, v);
+            //     color += ray_color(&ray, &world, max_depth);
+            // }
 
             color /= samper_per_pixel as f64;
-            //color.fix();
+            color.fix();
             *pixel = color.into()
         });
     });

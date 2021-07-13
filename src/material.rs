@@ -83,10 +83,7 @@ impl Material for Dielectric {
         };
 
         let _unit_dir = ray.dir.unit();
-        let _cos_theta = fmin(
-            Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - ray.dir, _out_normal),
-            1.0,
-        );
+        let _cos_theta = Vec3::dot(Vec3::new(0.0, 0.0, 0.0) - ray.dir, _out_normal).min(1.0);
         let _sin_theta = (1.0 - _cos_theta.powi(2)).sqrt();
 
         let cannot_refract = _refaction_ratio * _sin_theta > 1.0;
