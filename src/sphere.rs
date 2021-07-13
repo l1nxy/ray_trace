@@ -20,6 +20,7 @@ pub struct Sphere {
 }
 
 impl Hittable for Sphere {
+    #[inline(always)]
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.orig - self.center;
         let a = ray.dir.length_squared();

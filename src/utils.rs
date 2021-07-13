@@ -4,10 +4,13 @@ use super::ray::*;
 use super::vec3::*;
 
 pub fn ray_color(ray_in: &Ray, world: &HittableList, depth: i32) -> Color {
-    if let Some(ret) = world.hit(*ray_in, 0.0000001, f64::MAX) {
+    if depth == 0 {
+        return Color::default();
+    }
+    if let Some(ret) = world.hit(*ray_in, 0.001, f64::MAX) {
         let mut scattered = Ray::new(&Vec3::default(), &Vec3::default());
         let mut color = Color::default();
-        if depth > 0 && ret.mat.scatter(ray_in, &ret, &mut color, &mut scattered) {
+        if ret.mat.scatter(ray_in, &ret, &mut color, &mut scattered) {
             ray_color(&scattered, world, depth - 1) * color
         } else {
             Color::default()

@@ -15,7 +15,6 @@ use sphere::*;
 use utils::*;
 use vec3::*;
 
-use image::{ImageBuffer, RgbImage};
 fn random_scene() -> Box<HittableList> {
     let mut world = Box::new(HittableList::new());
     let materail_ground = Box::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
@@ -87,10 +86,10 @@ fn random_scene() -> Box<HittableList> {
     world
 }
 fn main() {
-    let image_width = 1200;
-    let image_height = 800;
+    let image_width = 600;
+    let image_height = 400;
     let samper_per_pixel = 10;
-    let max_depth = 10;
+    let max_depth = 50;
 
     let world = random_scene();
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
@@ -100,21 +99,38 @@ fn main() {
     let camera = Camera::new(lookfrom, lookat, vup, 20.0, 3.0 / 2.0, 0.1, dist_to_focus);
     let get_offset = |value: u32| -> f64 { value as f64 + get_random_number() };
 
-    let pixle_generator = |x, y| -> image::Rgb<u8> {
-        let mut color = Color::default();
-        for _ in 0..samper_per_pixel {
-            let u = get_offset(x) / (image_width - 1) as f64;
-            let v = get_offset(y) / (image_height - 1) as f64;
+    let mut buffer: image::ImageBuffer<image::Rgb<u8>, _> =
+        image::ImageBuffer::new(image_width, image_height);
 
-            let ray = camera.get_ray(u, v);
-            color += ray_color(&ray, &world, max_depth);
+    // buffer.enumerate_rows_mut().for_each(|(y,row)|{
+    //     if y % 5 == 0 {
+    //         println!("line:{}",y);
+    //     }
+
+    //     row.for_each(|(x,y,pixel|{})
+    // });
+
+    buffer.enumerate_rows_mut().for_each(|(y, rows)| {
+        if y % 5 == 0 {
+            println!("line: {}", y);
         }
+        rows.for_each(|(x, y, pixel)| {
+            let mut color = Color::default();
+            for _ in 0..samper_per_pixel {
+                let u = get_offset(x) / (image_width - 1) as f64;
+                let v = get_offset(y) / (image_height - 1) as f64;
 
-        color /= samper_per_pixel as f64;
-        color.fix();
-        color.into()
-    };
+                let ray = camera.get_ray(u, v);
+                color += ray_color(&ray, &world, max_depth);
+            }
 
-    let image: RgbImage = ImageBuffer::from_fn(image_width, image_height, pixle_generator);
-    image.save("pic.png").unwrap();
+            color /= samper_per_pixel as f64;
+            //color.fix();
+            *pixel = color.into()
+        });
+    });
+
+    // let image: RgbImage = ImageBuffer::from_fn(image_width, image_height, pixle_generator);
+    //image.save("pic.png").unwrap();
+    buffer.save("pic.png").unwrap();
 }
