@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, DivAssign, Mul};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul};
 
 use crate::utils::{get_random_number, get_random_number_range};
 #[derive(Debug, Clone, Copy)]
@@ -9,6 +9,7 @@ pub struct Color {
 }
 
 impl Color {
+    #[inline(always)]
     pub fn new(ir: f64, ig: f64, ib: f64) -> Self {
         Self {
             r: ir,
@@ -94,6 +95,17 @@ impl DivAssign<f64> for Color {
         self.r /= rhs;
         self.g /= rhs;
         self.b /= rhs;
+    }
+}
+
+impl Div<f64> for Color {
+    type Output = Self;
+    fn div(self, rhs: f64) -> Self {
+        Self {
+            r: self.r / rhs,
+            g: self.g / rhs,
+            b: self.b / rhs,
+        }
     }
 }
 

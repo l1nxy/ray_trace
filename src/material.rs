@@ -11,6 +11,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
+    #[inline(always)]
     fn scatter(&self, _: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool {
         let mut scatter_dir = rec.normal + random_in_unit_sphere().unit();
         if scatter_dir.near_zero() {
@@ -34,6 +35,7 @@ pub struct Metal {
 }
 
 impl Material for Metal {
+    #[inline(always)]
     fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool {
         let reflected = ray.dir.unit().reflect(rec.normal);
         let fuzz_ray = reflected + random_in_unit_sphere() * self.fuzz;
@@ -44,6 +46,7 @@ impl Material for Metal {
 }
 
 impl Metal {
+    #[inline(always)]
     pub fn new(color: Color, fuzz: f64) -> Self {
         Self {
             albedo: color,
@@ -57,10 +60,12 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
+    #[inline(always)]
     pub fn new(_refracted: f64) -> Self {
         Self { ir: _refracted }
     }
 
+    #[inline(always)]
     fn reflectance(cosine: f64, ref_index: f64) -> f64 {
         let r0 = ((1.0 - ref_index) / (1.0 + ref_index)).powi(2);
         r0 + (1.0 - r0) * ((1.0 - cosine).powi(5))
@@ -68,6 +73,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
+    #[inline(always)]
     fn scatter(
         &self,
         ray: &Ray,
