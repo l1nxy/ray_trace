@@ -12,6 +12,7 @@ use color::*;
 use hittable_list::*;
 use material::*;
 use ray::*;
+use rayon::prelude::*;
 use sphere::*;
 use utils::*;
 use vec3::*;
@@ -89,8 +90,8 @@ fn random_scene() -> HittableList {
     world
 }
 fn main() {
-    let image_width = 600;
-    let image_height = 400;
+    let image_width: usize = 600;
+    let image_height: usize = 400;
     let samper_per_pixel = 10;
     let max_depth = 50;
 
@@ -101,18 +102,13 @@ fn main() {
     let dist_to_focus = 10.0;
     let camera = Camera::new(lookfrom, lookat, vup, 20.0, 3.0 / 2.0, 0.1, dist_to_focus);
 
-    let mut buffer: image::ImageBuffer<image::Rgb<u8>, _> =
-        image::ImageBuffer::new(image_width, image_height);
-
-    buffer.enumerate_rows_mut().for_each(|(y, rows)| {
-        if y % 5 == 0 {
-            println!("line: {}", y);
-        }
-        rows.for_each(|(x, y, pixel)| {
-            let (x, y) = (x as f64, y as f64);
+    let mut pixel = Vec::with_capacity(image_width * image_height);
+    for j in (0..image_height).rev() {
+        let par_iter = (0..image_width).into_par_iter().map(|i| {
             let mut color = (0..samper_per_pixel)
                 .into_iter()
                 .fold(Color::default(), |acc, _| {
+                    let (x, y) = (i as f64, j as f64);
                     let u = (x + get_random_number()) / (image_width - 1) as f64;
                     let v = (y + get_random_number()) / (image_height - 1) as f64;
 
@@ -120,11 +116,13 @@ fn main() {
                     acc + ray_color(&ray, &world, max_depth)
                 })
                 / samper_per_pixel as f64;
-
             color.fix();
-            *pixel = color.into()
         });
-    });
 
+        let mut line_pixel: Vec<Color> = par_iter.collect();
+        pixel.append(&mut line_pixel);
+    }
+    let buffer =
+        image::ImageBuffer::from_vec(image_width as u32, image_height as u32, pixel).unwrap();
     buffer.save("pic.png").unwrap();
 }

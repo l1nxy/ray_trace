@@ -2,17 +2,17 @@ use super::ray::*;
 use super::vec3::Vec3;
 use crate::material::*;
 use std::sync::Arc;
+#[derive(Clone, Debug)]
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
     pub t: f64,
     pub mat: Arc<dyn Material>,
 }
-
-pub trait Hittable {
+pub trait Hittable: std::fmt::Debug + Send + Sync {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
-//#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,

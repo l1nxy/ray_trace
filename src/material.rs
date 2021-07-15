@@ -2,10 +2,11 @@ use crate::{
     color::Color, ray::Ray, sphere::HitRecord, utils::random_in_unit_sphere, utils::*, vec3::*,
 };
 
-pub trait Material {
+pub trait Material: std::fmt::Debug + Send + Sync {
     fn scatter(&self, ray: &Ray, rec: &HitRecord, color: &mut Color, scattered: &mut Ray) -> bool;
 }
 
+#[derive(Debug)]
 pub struct Lambertian {
     pub albedo: Color,
 }
@@ -29,6 +30,7 @@ impl Lambertian {
     }
 }
 
+#[derive(Debug)]
 pub struct Metal {
     pub albedo: Color,
     pub fuzz: f64,
@@ -55,6 +57,7 @@ impl Metal {
     }
 }
 
+#[derive(Debug)]
 pub struct Dielectric {
     pub ir: f64,
 }
